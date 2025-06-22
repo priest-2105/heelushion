@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { scheduleAlarmNotification, cancelAlarmNotification } from '../utils/notifications';
 
 const ALARMS_STORAGE_KEY = '@Heelushion:alarms';
 
-export const useAlarms = () => {
+export const AlarmsContext = createContext();
+
+export const AlarmsProvider = ({ children }) => {
   const [alarms, setAlarms] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,9 +32,9 @@ export const useAlarms = () => {
 
   const saveAlarms = async (newAlarms) => {
     try {
+      setAlarms(newAlarms);
       const jsonValue = JSON.stringify(newAlarms);
       await AsyncStorage.setItem(ALARMS_STORAGE_KEY, jsonValue);
-      setAlarms(newAlarms);
     } catch (e) {
       console.error('Failed to save alarms.', e);
     }
@@ -49,12 +51,9 @@ export const useAlarms = () => {
   };
 
   const updateAlarm = async (updatedAlarm) => {
-    // If alarm is being enabled, schedule a notification
     if (updatedAlarm.enabled && !updatedAlarm.notificationId) {
       updatedAlarm.notificationId = await scheduleAlarmNotification(updatedAlarm);
-    } 
-    // If alarm is being disabled, cancel the notification
-    else if (!updatedAlarm.enabled && updatedAlarm.notificationId) {
+    } else if (!updatedAlarm.enabled && updatedAlarm.notificationId) {
       await cancelAlarmNotification(updatedAlarm.notificationId);
       updatedAlarm.notificationId = null;
     }
@@ -74,5 +73,9 @@ export const useAlarms = () => {
     saveAlarms(newAlarms);
   };
 
-  return { alarms, loading, addAlarm, updateAlarm, deleteAlarm };
+  return (
+    <AlarmsContext.Provider value={{ alarms, loading, addAlarm, updateAlarm, deleteAlarm }}>
+      {children}
+    </AlarmsContext.Provider>
+  );
 }; 

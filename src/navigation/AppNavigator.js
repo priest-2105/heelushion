@@ -61,7 +61,10 @@ const AppNavigator = () => {
         <Stack.Screen
           name="AddAlarm"
           component={AddAlarmScreen}
-          options={{ presentation: 'modal', title: 'Add Alarm' }}
+          options={{ 
+            presentation: 'fullscreenModal', 
+            headerShown: false 
+          }}
         />
         <Stack.Screen
           name="AlarmRinging"

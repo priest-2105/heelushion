@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, AppState } from 'react-native';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import { useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 const AlarmRingingScreen = () => {

@@ -2,9 +2,26 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 export const requestPermissions = async () => {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-        alert('You need to enable notifications in settings');
+    // For Android, we must create a channel before asking for permissions
+    if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('alarm-channel', {
+            name: 'Alarms',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            sound: 'default', // Use default notification sound
+            lightColor: '#FF231F7C',
+            lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+        });
+    }
+
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+        alert('You need to enable notifications in settings for alarms to work.');
         return false;
     }
     return true;
@@ -22,8 +39,6 @@ export const scheduleAlarmNotification = async (alarm) => {
     const hasPermissions = await requestPermissions();
     if (!hasPermissions) return;
 
-    const trigger = alarm.realTime;
-
     const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
             title: "It's time!",
@@ -31,7 +46,10 @@ export const scheduleAlarmNotification = async (alarm) => {
             data: { alarm },
             sound: 'default' // This will use the default notification sound
         },
-        trigger,
+        trigger: {
+            date: alarm.realTime,
+            channelId: 'alarm-channel',
+        }
     });
     return notificationId;
 };
