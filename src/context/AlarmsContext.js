@@ -18,6 +18,7 @@ export const AlarmsProvider = ({ children }) => {
           setAlarms(JSON.parse(storedAlarms).map(alarm => ({
             ...alarm,
             realTime: new Date(alarm.realTime),
+            displayTime: new Date(alarm.displayTime),
           })));
         }
       } catch (e) {
@@ -32,11 +33,12 @@ export const AlarmsProvider = ({ children }) => {
 
   const saveAlarms = async (newAlarms) => {
     try {
-      setAlarms(newAlarms);
       const jsonValue = JSON.stringify(newAlarms);
       await AsyncStorage.setItem(ALARMS_STORAGE_KEY, jsonValue);
+      return newAlarms;
     } catch (e) {
       console.error('Failed to save alarms.', e);
+      return alarms;
     }
   };
 
@@ -47,7 +49,7 @@ export const AlarmsProvider = ({ children }) => {
     }
     const newAlarm = { ...alarm, id: Date.now().toString(), notificationId };
     const newAlarms = [...alarms, newAlarm];
-    saveAlarms(newAlarms);
+    setAlarms(await saveAlarms(newAlarms));
   };
 
   const updateAlarm = async (updatedAlarm) => {
@@ -61,7 +63,7 @@ export const AlarmsProvider = ({ children }) => {
     const newAlarms = alarms.map((alarm) =>
       alarm.id === updatedAlarm.id ? updatedAlarm : alarm
     );
-    saveAlarms(newAlarms);
+    setAlarms(await saveAlarms(newAlarms));
   };
 
   const deleteAlarm = async (id) => {
@@ -70,7 +72,7 @@ export const AlarmsProvider = ({ children }) => {
       await cancelAlarmNotification(alarmToDelete.notificationId);
     }
     const newAlarms = alarms.filter((alarm) => alarm.id !== id);
-    saveAlarms(newAlarms);
+    setAlarms(await saveAlarms(newAlarms));
   };
 
   return (

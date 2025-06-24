@@ -6,14 +6,22 @@ import { getAmPmSymbol, formatNextAlarmDate } from '../utils/time';
 const AlarmItem = ({ alarm, onToggle, onDelete }) => {
   const { colors } = useTheme();
 
+  const formatTime = (dateToFormat) => {
+    if (!dateToFormat) return { time: '', period: '' };
+    const timeString = dateToFormat.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const [time, period] = timeString.split(' ');
+    return { time, period };
+  };
+
+  const { time, period } = formatTime(alarm.displayTime);
+
   return (
     <TouchableOpacity onLongPress={onDelete} activeOpacity={0.7}>
       <View style={[styles.container, { backgroundColor: colors.card }]}>
         <View style={styles.timeContainer}>
           <Text style={[styles.time, { color: alarm.enabled ? colors.text : colors.border }]}>
-            <Text style={styles.amPm}>{getAmPmSymbol(alarm.realTime)} </Text>
-            {alarm.displayTime.split(' ')[0]}
-            <Text style={styles.timePeriod}> {alarm.displayTime.split(' ')[1]}</Text>
+            {time}
+            <Text style={styles.timePeriod}> {period}</Text>
           </Text>
           <Text style={[styles.label, { color: alarm.enabled ? colors.text : colors.border }]}>
             {formatNextAlarmDate(alarm.realTime)}
@@ -47,9 +55,6 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 42,
     fontWeight: 'bold',
-  },
-  amPm: {
-    fontSize: 24,
   },
   timePeriod: {
     fontSize: 20,

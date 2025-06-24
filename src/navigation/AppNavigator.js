@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 import AlarmListScreen from '../screens/AlarmListScreen';
 import AddAlarmScreen from '../screens/AddAlarmScreen';
 import AlarmRingingScreen from '../screens/AlarmRingingScreen';
+import RepeatScreen from '../screens/RepeatScreen';
 
 const Stack = createStackNavigator();
 
@@ -70,6 +71,14 @@ const AppNavigator = () => {
           name="AlarmRinging"
           component={AlarmRingingScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Repeat"
+          component={RepeatScreen}
+          options={{
+            presentation: 'modal',
+            headerShown: false
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
