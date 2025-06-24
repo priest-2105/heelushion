@@ -16,11 +16,12 @@ const styles = StyleSheet.create({
   },
   previewTime: {
     fontSize: 82,
+    paddingTop: 50,
     fontWeight: 'bold',
   },
   previewAmPm: {
     fontSize: 24,
-    alignSelf: 'flex-end',
+    alignSelf: 'center',
     bottom: 15,
   },
   settingsContainer: {
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingBottom: 70,
     paddingTop: 10,
     paddingHorizontal: 20,
   },
