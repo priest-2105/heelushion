@@ -1,7 +1,26 @@
 import React from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { getAmPmSymbol, formatNextAlarmDate } from '../utils/time';
+
+const formatNextAlarmDate = (date) => {
+  if (!date) return 'Alarm';
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const isToday = date.getFullYear() === now.getFullYear() &&
+                  date.getMonth() === now.getMonth() &&
+                  date.getDate() === now.getDate();
+
+  const isTomorrow = date.getFullYear() === tomorrow.getFullYear() &&
+                     date.getMonth() === tomorrow.getMonth() &&
+                     date.getDate() === tomorrow.getDate();
+
+  if (isToday) return 'Today';
+  if (isTomorrow) return 'Tomorrow';
+  
+  return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+};
 
 const AlarmItem = ({ alarm, onToggle, onDelete }) => {
   const { colors } = useTheme();
