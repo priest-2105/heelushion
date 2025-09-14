@@ -35,7 +35,7 @@ const AlarmItem = ({ alarm, onToggle, onDelete, onLongPress, selected, multiSele
   };
 
   const disabledColor = '#aaa';
-  const alarmColor = alarm.enabled ? colors.text : disabledColor;
+  const alarmColor = alarm.enabled ? '#fff' : disabledColor;
   const { time, period } = formatTime(alarm.displayTime);
 
   return (
