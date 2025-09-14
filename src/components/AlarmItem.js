@@ -22,27 +22,35 @@ const formatNextAlarmDate = (date) => {
   return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 };
 
-const AlarmItem = ({ alarm, onToggle, onDelete }) => {
+const AlarmItem = ({ alarm, onToggle, onDelete, onLongPress, selected, multiSelectMode, onPress }) => {
   const { colors } = useTheme();
 
   const formatTime = (dateToFormat) => {
     if (!dateToFormat) return { time: '', period: '' };
-    const timeString = dateToFormat.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    const dateObj = dateToFormat instanceof Date ? dateToFormat : new Date(dateToFormat);
+    if (isNaN(dateObj.getTime())) return { time: '', period: '' };
+    const timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     const [time, period] = timeString.split(' ');
     return { time, period };
   };
 
+  const disabledColor = '#aaa';
+  const alarmColor = alarm.enabled ? colors.text : disabledColor;
   const { time, period } = formatTime(alarm.displayTime);
 
   return (
-    <TouchableOpacity onLongPress={onDelete} activeOpacity={0.7}>
-      <View style={[styles.container, { backgroundColor: colors.card }]}>
+    <TouchableOpacity
+      onLongPress={onLongPress}
+      onPress={multiSelectMode ? onPress : undefined}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.container, { backgroundColor: colors.card }, selected && styles.selected]}>
         <View style={styles.timeContainer}>
-          <Text style={[styles.time, { color: alarm.enabled ? colors.text : colors.border }]}>
+          <Text style={[styles.time, { color: alarmColor }]}> 
             {time}
             <Text style={styles.timePeriod}> {period}</Text>
           </Text>
-          <Text style={[styles.label, { color: alarm.enabled ? colors.text : colors.border }]}>
+          <Text style={[styles.label, { color: alarmColor }]}> 
             {formatNextAlarmDate(alarm.realTime)}
           </Text>
         </View>
@@ -67,6 +75,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 8,
     borderRadius: 20,
+  },
+  selected: {
+    borderWidth: 2,
+    borderColor: '#ff9500',
   },
   timeContainer: {
     flexDirection: 'column',

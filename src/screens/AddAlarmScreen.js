@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, StyleSheet, Text, Platform, TouchableOpacity, SafeAreaView, Switch } from 'react-native';
+import { View, StyleSheet, Text, Platform, TouchableOpacity, Switch } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { AlarmsContext } from '../context/AlarmsContext';
 import { useNavigation, useTheme, useRoute } from '@react-navigation/native';
@@ -90,7 +91,10 @@ const AddAlarmScreen = () => {
   }, [route.params?.repeat]);
 
   const formatTime = (dateToFormat) => {
-    return dateToFormat.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!dateToFormat) return '';
+    const dateObj = dateToFormat instanceof Date ? dateToFormat : new Date(dateToFormat);
+    if (isNaN(dateObj.getTime())) return '';
+    return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   const formatDate = (dateToFormat) => {
@@ -142,7 +146,7 @@ const AddAlarmScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+  <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}> 
       <View style={styles.previewContainer}>
         <Text style={[styles.previewTime, { color: colors.text }]}>{formatTime(displayTime).split(' ')[0]}</Text>
         <Text style={[styles.previewAmPm, { color: colors.text }]}>{formatTime(displayTime).split(' ')[1]}</Text>

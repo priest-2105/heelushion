@@ -9,21 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.1.2",
-    "@react-native-community/datetimepicker": "8.3.0",
+    "@expo/metro-runtime": "~6.1.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/datetimepicker": "^8.4.4",
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/stack": "^7.4.0",
-    "expo": "~53.0.12",
-    "expo-audio": "~0.4.6",
-    "expo-notifications": "~0.31.3",
-    "expo-status-bar": "~2.2.3",
-    "react": "19.0.0",
-    "react-native": "0.79.4",
-    "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.11.1",
-    "react-dom": "19.0.0",
-    "react-native-web": "^0.20.0",
-    "@expo/metro-runtime": "~5.0.4"
+    "expo": "^54.0.7",
+    "expo-audio": "~1.0.11",
+    "expo-notifications": "^0.32.11",
+    "expo-status-bar": "~3.0.8",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-native": "^0.81.4",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-web": "^0.21.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Button, Text, Platform, TouchableOpacity, UIManager, LayoutAnimation } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, FlatList, Button, Text, Platform, TouchableOpacity, UIManager, LayoutAnimation, Alert } from 'react-native';
 import { AlarmsContext } from '../context/AlarmsContext';
 import AlarmItem from '../components/AlarmItem';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -8,6 +8,9 @@ const AlarmListScreen = () => {
   const { alarms, loading, updateAlarm, deleteAlarm } = useContext(AlarmsContext);
   const navigation = useNavigation();
   const { colors } = useTheme();
+
+  const [multiSelectMode, setMultiSelectMode] = useState(false);
+  const [selectedAlarms, setSelectedAlarms] = useState([]);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -20,13 +23,26 @@ const AlarmListScreen = () => {
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('AddAlarm')} style={{ marginRight: 10 }}>
+        multiSelectMode ? (
+          <TouchableOpacity onPress={handleBulkDelete} style={{ marginRight: 10 }}>
+            <Text style={{ color: 'red', fontSize: 20 }}>Delete ({selectedAlarms.length})</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => navigation.navigate('AddAlarm')} style={{ marginRight: 10 }}>
             <Text style={{ color: colors.text, fontSize: 30 }}>+</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        )
       ),
-      title: 'Alarm'
+      title: multiSelectMode ? 'Select Alarms' : 'Alarm',
+      headerLeft: () => (
+        multiSelectMode ? (
+          <TouchableOpacity onPress={exitMultiSelect} style={{ marginLeft: 10 }}>
+            <Text style={{ color: colors.text, fontSize: 20 }}>Cancel</Text>
+          </TouchableOpacity>
+        ) : null
+      ),
     });
-  }, [navigation, colors]);
+  }, [navigation, colors, multiSelectMode, selectedAlarms.length]);
 
   useEffect(() => {
     if(!loading) {
@@ -61,6 +77,39 @@ const AlarmListScreen = () => {
     return `Alarm in ${timeToGo}`;
   };
 
+  const handleAlarmLongPress = (id) => {
+    setMultiSelectMode(true);
+    setSelectedAlarms([id]);
+  };
+
+  const handleAlarmPress = (id) => {
+    if (multiSelectMode) {
+      setSelectedAlarms((prev) =>
+        prev.includes(id) ? prev.filter((aid) => aid !== id) : [...prev, id]
+      );
+    }
+  };
+
+  const handleBulkDelete = () => {
+    Alert.alert(
+      'Delete Alarms',
+      `Are you sure you want to delete ${selectedAlarms.length} alarm(s)?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => {
+          selectedAlarms.forEach(id => deleteAlarm(id));
+          setMultiSelectMode(false);
+          setSelectedAlarms([]);
+        }}
+      ]
+    );
+  };
+
+  const exitMultiSelect = () => {
+    setMultiSelectMode(false);
+    setSelectedAlarms([]);
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -81,11 +130,16 @@ const AlarmListScreen = () => {
           <AlarmItem
             alarm={item}
             onToggle={(enabled) => updateAlarm({ ...item, enabled })}
-            onDelete={() => deleteAlarm(item.id)}
+            onDelete={() => multiSelectMode ? handleAlarmPress(item.id) : deleteAlarm(item.id)}
+            onLongPress={() => handleAlarmLongPress(item.id)}
+            selected={selectedAlarms.includes(item.id)}
+            multiSelectMode={multiSelectMode}
+            onPress={() => handleAlarmPress(item.id)}
           />
         )}
         ListEmptyComponent={<Text style={styles.emptyText}>No Alarms</Text>}
         contentContainerStyle={{ paddingTop: nextAlarmText ? 0 : 20 }}
+        extraData={{ selectedAlarms, multiSelectMode }}
       />
     </View>
   );
